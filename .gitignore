@@ -1,0 +1,12 @@
+data
+data/
+*.mp4
+*.txt.gz
+__pycache__/
+.venv/
+submissions/*_diagnostics.json
+evaluation/results/*.csv
+evaluation/reports/
+evaluation/scoreboard.csv
+notes/
+*.local.md
