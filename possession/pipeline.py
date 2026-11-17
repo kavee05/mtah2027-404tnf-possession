@@ -96,8 +96,21 @@ def build(data_dir=None, game=GAME, diag=None):
         sides[v] = side(v)
     log("smart tagging: {} instances, Team -> side {}".format(len(events), sides))
 
-    # ---------------------------------------------------------------- graded mask
     blocks = half_video_blocks(game)
+    labels = decode(px, py, ps, bx, by, slot_team, events, meta["home_name"],
+                    meta["away_name"], n, pitch, blocks, KICKOFF, diag)
+    log("decoded  [{:.0f}s total]".format(time.time() - t0))
+    return labels, diag
+
+
+def decode(px, py, ps, bx, by, slot_team, events, home_name, away_name, n, pitch, blocks,
+           kickoff, diag=None):
+    """Arrays in, labels out. Everything match-specific is passed in, so the same decoder runs
+    on any match in this format (used for the out-of-sample check on Metrica's public games)."""
+    diag = {} if diag is None else diag
+    L, W = pitch
+    side = lambda t: D.team_side(t, home_name, away_name)  # noqa: E731
+    # ---------------------------------------------------------------- graded mask
     graded = np.zeros(n, bool)
     half_of = np.zeros(n, np.int8)
     for h, a, b in blocks:
@@ -134,7 +147,7 @@ def build(data_dir=None, game=GAME, diag=None):
         rm(sh["h_spd"] - sh["a_spd"]),
         rm((sh["h_mx"] + sh["a_mx"]) / 2 - L / 2),
     ]
-    TF, codes = F.tag_features(events, n, meta["home_name"], meta["away_name"], D.team_side)
+    TF, codes = F.tag_features(events, n, home_name, away_name, D.team_side)
     X = np.column_stack(shape_cols + [TF[:, i] for i in range(TF.shape[1])])
     X = np.nan_to_num(X, nan=0.0)
     names = ["dmx", "dsx", "dsy", "dspd", "tilt"] + ["tag:" + c for c in codes]
@@ -232,14 +245,13 @@ def build(data_dir=None, game=GAME, diag=None):
                      [c["c_from_dead"], c["c_from_dead"], 0]])
     labels = np.full(n, "X", dtype="<U1")
     for h, a, b in blocks:
-        ko = max(a, KICKOFF.get(h, a))
+        ko = max(a, kickoff.get(h, a))
         if ko > a:
             labels[a:ko] = "D"
         sl = slice(ko, b + 1)
         path = M.viterbi(score[sl], cost, start=np.array([-5.0, -5.0, 0.0]))
         labels[sl] = np.array(M.STATES)[path]
-    log("decoded  [{:.0f}s total]".format(time.time() - t0))
-    return labels, diag
+    return labels
 
 
 def summarise(labels, game=GAME):

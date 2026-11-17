@@ -69,11 +69,28 @@ On that window our file scores spellF1 0.507 and macroF1 0.718. The strongest of
 
 Over the full match the decoder produces 254 possessions with a mean length of 15 seconds. That is in the range a real match has.
 
-## 6. Training data
+## 6. Testing on matches we never saw
 
-We used no human labelled data at all. Not from this game and not from any other game. The only labels in the pipeline are the proximity based pseudo labels described in section 3.2 and those are produced by code.
+Five public minutes cannot tell us whether the method holds up on a new game. So we ran the exact same pipeline with the exact same constants on the three public sample matches that Metrica publishes. None of them were used while building it.
 
-## 7. Limitations and what we would do next
+Those matches come with a human event log. We turned it into a possession answer key with code. The team in possession is the team of the latest pass, carry, shot, recovery or set piece. The ball is dead from a ball out, a foul or a goal until the next restart. Labels from other games are allowed by the rules.
+
+These games have no Smart Tagging. We therefore ran the pipeline twice. Once with no tags at all, and once with a simple stand in that marks a five second window around each restart with the team taking it. Throw ins get no team, as in the real tagging.
+
+| Game | spellF1 no tags | spellF1 with set piece tags | macroF1 with set piece tags |
+|---|---|---|---|
+| Sample game 1 | 0.539 | 0.574 | 0.738 |
+| Sample game 2 | 0.498 | 0.568 | 0.693 |
+| Sample game 3 | 0.511 | 0.559 | 0.758 |
+| Average | 0.516 | 0.567 | 0.730 |
+
+The scores on new matches sit in the same range as on the public window of this match. That tells us the constants are not tied to one game. The event based answer key is not defined in exactly the same way as the competition ground truth, so we read these numbers as a check on robustness and not as a forecast. The script is `validation/metrica_sample_games.py` and the instructions to run it are at its top.
+
+## 7. Training data
+
+The pipeline itself uses no human labelled data at all. The only labels it learns from are the proximity based pseudo labels described in section 3.2 and those are produced by code. The event logs of Metrica's three public sample matches were used only to test the finished pipeline in section 6. They were written by Metrica and are freely available. They were never used to choose any constant.
+
+## 8. Limitations and what we would do next
 
 We think we predict too much dead ball. The motion signal also fires during slow spells of play, and about 32 percent of all frames end up as D. A detector trained on whistle and restart patterns from other matches would fix most of this.
 
@@ -83,7 +100,7 @@ Fouls and offsides without a tagged set piece are found only through the motion 
 
 The team model is linear and quite small. A sequence model trained with the same pseudo labels could read team shape much better.
 
-## 8. Reproduction
+## 9. Reproduction
 
 ```
 pip install -r requirements.txt

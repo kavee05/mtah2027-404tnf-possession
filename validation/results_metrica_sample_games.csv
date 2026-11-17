@@ -1,0 +1,7 @@
+game,tags,spellF1,macroF1,team_acc,alive_dead_F1,poss,gt_poss
+Game 1,no tags,0.539,0.724,0.727,0.84,221,304
+Game 1,set-piece tags,0.574,0.738,0.729,0.846,235,304
+Game 2,no tags,0.498,0.663,0.735,0.84,183,283
+Game 2,set-piece tags,0.568,0.693,0.733,0.851,208,283
+Game 3,no tags,0.511,0.718,0.814,0.89,221,343
+Game 3,set-piece tags,0.559,0.758,0.816,0.903,245,343

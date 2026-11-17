@@ -36,6 +36,13 @@ cp submissions/404_TNF.csv evaluation/results/
 python evaluation/run_evaluation.py
 ```
 
+Out-of-sample check on matches the pipeline never saw (see TECHNICAL.md section 6):
+
+```bash
+git clone --depth 1 https://github.com/metrica-sports/sample-data.git ../metrica-sample-data
+python validation/metrica_sample_games.py --data ../metrica-sample-data/data
+```
+
 ## Layout
 
 ```
@@ -46,6 +53,7 @@ possession/
   pipeline.py   end-to-end: data -> evidence -> decode -> CSV (+ diagnostics JSON)
 games.py        per-match constants, copied unchanged from the challenge repository
 evaluation/     official scorer + validator + public GT, copied unchanged (MIT)
+validation/     out-of-sample check on Metrica's 3 public sample matches
 TECHNICAL.md    the technical document
 ```
 
