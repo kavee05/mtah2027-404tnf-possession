@@ -12,7 +12,7 @@ That price is the important part. A real match has a few hundred possessions and
 
 We used three files from the tactical recording.
 
-The tracking metadata tells us which track slot belongs to which team. We read this mapping from the format specification in the file itself. We do not assume that low slot numbers are home players. The match has 24 home slots and 22 away slots so a fixed split would have been wrong.
+The tracking metadata tells us which track slot belongs to which team. We read this mapping from the format specification in the file itself. We do not assume which slot numbers belong to which team. In this match the first 24 slots are home and the last 22 are away, but reading the mapping from the file means the code stays correct if another export orders them differently.
 
 The tracking itself gives player and ball positions for every frame. We convert everything to metres using the 105.3 by 68 metre pitch from games.py.
 
